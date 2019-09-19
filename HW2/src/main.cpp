@@ -1,37 +1,46 @@
 #include <iostream>
-using namespace std;
+#include <fstream>
+#include <time.h>
 
 
 int main()
 {
-	//Variables used for 5 input numbers, and min/max	
-	int a,b,c,d,e = 0;
-	int max, min = 0;
+	srand(time(0));
+	int numIterations = 0;
 
-	//Taking in 5 numbers as an input
-	cout << "Input 5 numbers: " << endl;
+	std::cout << "Please enter the number of iterations you would like to use in the Monte Carlo simulation: ";
 
-	cin >> a >> b >> c >> d >> e;
+	std::cin >> numIterations;
 
-	min = a;
-	max = a;
+	if(!(numIterations > 0))
+	{
+		std::cout << "Please enter a positive number of iterations";
+		std::cin >> numIterations;
+	}
 
-	//Logic to check if any of the 5 numbers are a min or a max
-	if(b < min)	     min = b;
-	else if(b > max) max = b;
+	ofstream file;
 
-	if(c < min) min = c;
-	else if(c > max) max = c;
+	file.open("results.txt");
 
-	if(d < min) min = d;
-	else if(d > max) max = d;
+	double x,y = 0.0;
+	int circleCount = 0;
 
-	if(e < min) min = e;
-	else if(e > max) max = e;
-	
-	//Outputting the final results
-	std::cout << "Min: " << min << std::endl;
-	std::cout << "Max: " << max << std::endl;
 
-	return 0;
+	for (int i=0; i<numIterations; i++)
+	{
+		x = static_cast<double>(rand()/RAND_MAX);		
+		y = static_cast<double>(rand()/RAND_MAX);
+
+		if(x**2 + y**2 <= 1)
+		{
+			circleCount++;
+		}
+	}
+
+	file << x << ',' << y << std::endl;
+	double pi = (circleCount/numIterations)*4.0
+
+	std::cout << "The monte carlo approximation for pi using specified amount of iterations is: " << pi << std::endl;
+
+	return 0; 
 }
