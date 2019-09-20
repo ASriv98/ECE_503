@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <math.h>
 #include <time.h>
 
 
@@ -18,29 +19,34 @@ int main()
 		std::cin >> numIterations;
 	}
 
-	ofstream file;
+	std::ofstream file;
 
 	file.open("results.txt");
 
 	double x,y = 0.0;
-	int circleCount = 0;
+	double circleCount = 0.0;
 
 
 	for (int i=0; i<numIterations; i++)
 	{
-		x = static_cast<double>(rand()/RAND_MAX);		
-		y = static_cast<double>(rand()/RAND_MAX);
+		x = rand() * 1.0 / RAND_MAX;
+		y = rand() * 1.0 / RAND_MAX;		
 
-		if(x**2 + y**2 <= 1)
+		//std::cout << x << std::endl;
+		//std::cout << y << std::endl;
+
+		file << x << ',' << y << std::endl;
+
+		if((pow(x,2) + pow(y,2)) <= 1)
 		{
-			circleCount++;
+			circleCount+=1.0;
 		}
 	}
 
-	file << x << ',' << y << std::endl;
-	double pi = (circleCount/numIterations)*4.0
+	std::cout << circleCount;
+	std::cout << numIterations;
+	double pi = (circleCount/static_cast<double>(numIterations))*4.0;
 
 	std::cout << "The monte carlo approximation for pi using specified amount of iterations is: " << pi << std::endl;
-
 	return 0; 
 }
