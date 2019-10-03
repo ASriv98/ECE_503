@@ -2,13 +2,15 @@
 #include <stdexcept>
 #include <iomanip>
 
+//Inputting functions for matrix, choice, printing
 static int getUserChoice();
 static void getUserInput(int*, int*, double[]);
+static void printMatrix(bool, int*, int*, double[]);
 
-void Addition(int*, int*, int*, int*, double[], double[], double[]);
-void Subtraction(int*, int*, int*, int*, double[], double[], double[]);
-void Multiplication(int*, int*, int*, int*, double[], double[], double[]);
-
+//Computational Functions for specified matrix calculations
+void Add(int*, int*, int*, int*, double[], double[], double[]);
+void Subtract(int*, int*, int*, int*, double[], double[], double[]);
+void Multiply(int*, int*, int*, int*, double[], double[], double[]);
 double Determinant(int*, int*, double[]);
 static void Transpose(int*, int*, double[], double[]);
 static void Inverse(int*, int*, double[], double[]);
@@ -39,7 +41,7 @@ int getUserChoice()
 
 void getUserInput(int* row, int* col, double matrix[])
 {
-	std::cout << "Please enter the number of the row(1-10): " << std::endl;
+	std::cout << "Please enter the number of the row: " << std::endl;
 	std::cin  >> *row;
 
 	if((*row < 1) || (*row > 10))
@@ -47,7 +49,7 @@ void getUserInput(int* row, int* col, double matrix[])
 		throw std::invalid_argument("received invalid row choice");
 	}
 
-	std::cout << "Please enter the number of the column(1-10): " << std::endl;
+	std::cout << "Please enter the number of the column: " << std::endl;
 	std::cin  >> *col;
 
 	if((*col < 1) || (*col > 10))
@@ -79,7 +81,7 @@ static void printMatrix(bool result, int* row, int* col, double matrix[])
 	}
 }
 
-void Addition(int *rowA, int *colA, int *rowB, int *colB, double matrixA[], double matrixB[], double result[])
+void Add(int *rowA, int *colA, int *rowB, int *colB, double matrixA[], double matrixB[], double result[])
 {
 	if((*rowA != *rowB) || (*colA != *colB))
 	{
@@ -92,7 +94,7 @@ void Addition(int *rowA, int *colA, int *rowB, int *colB, double matrixA[], doub
 	}
 }
 
-void Subtraction(int *rowA, int *colA, int *rowB, int *colB, double matrixA[], double matrixB[], double result[])
+void Subtract(int *rowA, int *colA, int *rowB, int *colB, double matrixA[], double matrixB[], double result[])
 {
 
 	if((*rowA != *rowB) || (*colA != *colB))
@@ -106,7 +108,7 @@ void Subtraction(int *rowA, int *colA, int *rowB, int *colB, double matrixA[], d
 	}
 }
 
-void Multiplication(int *rowA, int *colA, int *rowB, int *colB, double matrixA[], double matrixB[], double result[])
+void Multiply(int *rowA, int *colA, int *rowB, int *colB, double matrixA[], double matrixB[], double result[])
 {
 	if(*colA != *rowB)
 	{
@@ -115,15 +117,17 @@ void Multiplication(int *rowA, int *colA, int *rowB, int *colB, double matrixA[]
 
 	for(int i=0; i < *rowA; i++)
 	{
-		for(int j=0; j <= *colB; j++)
+		for(int j=0; j < *colB; j++)
 		{
 			for (int k=0; k < *colA; k++)
 			{
-				result[i * (*colB) + j] += matrixA[i *(*colA) + k] + matrixB[k * (*colB) + j];
+				//std::cout << i * (*colB) + j << " : " << matrixA[i * (*colA) + k] + matrixB[k * (*colB) + j] << std::endl;
+				result[i * (*colB) + j] += (matrixA[i * (*colA) + k] * matrixB[k * (*colB) + j]);
 			}
 		}
 	}
 }
+
 
 double Determinant(int* rowA, int* colA, double matrixA[])
 {
@@ -132,7 +136,7 @@ double Determinant(int* rowA, int* colA, double matrixA[])
 		throw std::invalid_argument("Determinant operations not supported for non 3x3 matrices");
 	}
 
-	//hardcoded formula for a 3x3 determinant
+	//hardcoded formula for calculation of determinant of a 3x3 matrix
 	double determinant = matrixA[0]*(matrixA[4]*matrixA[8]-matrixA[5]*matrixA[7])-matrixA[1]*(matrixA[3]*matrixA[8]-matrixA[5]*matrixA[6])+matrixA[2]*(matrixA[3]*matrixA[7]-matrixA[4]*matrixA[6]);
 	return determinant;
 }
@@ -157,6 +161,7 @@ void Inverse(int* rowA, int* colA, double matrixA[], double inverse[])
 		throw std::invalid_argument("Determinant = 0-Inverse does not exist.");
 	}	
 
+	//hardcoded formula for inverse of a 3x3 matrix
 	 inverse[0] = (matrixA[4] * matrixA[8] - matrixA[7] * matrixA[5])*(1/determinant);
 	 inverse[1] = (matrixA[7] * matrixA[2] - matrixA[1] * matrixA[8])*(1/determinant);
 	 inverse[2] = (matrixA[1] * matrixA[5] - matrixA[2] * matrixA[4])*(1/determinant);
@@ -171,12 +176,17 @@ void Inverse(int* rowA, int* colA, double matrixA[], double inverse[])
 
 int main()
 {
-	bool exitStatus = false;
+
+	//used to exit program upon menu item 7 being selected
+	bool exitStatus = true;
 
 	while(exitStatus)
 	{
 		int choice = getUserChoice();
 
+		//initialization of all arrays that are used as matrices 
+		//matrixA, matrixB, result, inverse
+		//size of 10 by 10 vector (max 100 elements)
 		int rowA, rowB, colA, colB = 0;
 		double determinant = 0;
 		//Max size of the array is 10x10 (100 elements)
@@ -192,25 +202,27 @@ int main()
 			getUserInput(&rowB, &colB, matrixB); printMatrix(false, &rowB, &colB, matrixB);
 		}
 
+		//Choices 4-6 require only input of 1 matrix
 		if((choice == 4) || (choice == 5) || (choice == 6))
 		{	
 			getUserInput(&rowA, &colA, matrixA); printMatrix(false, &rowA, &colA, matrixA);
 		}
 
+		//switch cases going through menu choices
 		switch(choice)
 		{
 			case 1:
-				Addition(&rowA, &colA, &rowB, &colB, matrixA, matrixB, result);
+				Add(&rowA, &colA, &rowB, &colB, matrixA, matrixB, result);
 				printMatrix(true, &rowA, &colA, result);
 				break;
 
 			case 2: 
-				Subtraction(&rowA, &colA, &rowB, &colB, matrixA, matrixB, result);
+				Subtract(&rowA, &colA, &rowB, &colB, matrixA, matrixB, result);
 				printMatrix(true, &rowA, &colA, result);
 				break;
 			
 			case 3: 
-				Multiplication(&rowA, &colA, &rowB, &colB, matrixA, matrixB, result);
+				Multiply(&rowA, &colA, &rowB, &colB, matrixA, matrixB, result);
 				printMatrix(true, &rowA, &colA, result);
 				break;
 
@@ -230,7 +242,7 @@ int main()
 				break;
 
 			case 7: 
-				exitStatus = true;
+				exitStatus = false;
 				break;
 
 			default:
