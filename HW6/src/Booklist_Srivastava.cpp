@@ -1,40 +1,17 @@
 #include <iostream>
 #include <stdexcept>
 #include <iomanip>
+#include "Booklist_Srivastava.h"
 
-static int getUserChoice();
-static int getUserInput(bool);
-
-void insert(int mylist[], int num_in_list, int new_element);
-void insert_at(int mylist[], int num_in_list, int at_position, int new_element); 
-
-int  find_linear(int[], int, int);
-int  find_binary(int[], int, int, bool);
-
-void delete_item_position(int[], int *, int); 
-void delete_item_isbn(int mylist[], int *, int); 
-
-void sort_list_selection(int[], int);
-void sort_list_bubble(int[], int); 
-
-void print(int[], int);
-
-void print(int mylist[], int num_in_list)
+//Constructor
+Booklist::Booklist()
 {
-	std::cout << "Your book list is now: " << std::endl;
-	if(num_in_list != 0)
-	{
-		for(int i = 0; i < num_in_list; i++)
-		{
-			std::cout << (i+1) << ". " << mylist[i] << std::endl;
-		}
-	}
-	else {std::cout << "Empty." << std::endl;}
-	std::cout << std::endl;
+	mylist[20] = {};
+	sorted = false; 
+	num_in_list = 0;
 }
 
-//Function to display menu and to get user's choice from the menu selection
-int getUserChoice()
+int Booklist::getUserChoice()
 {
 	int choice = 0;
 
@@ -46,7 +23,7 @@ int getUserChoice()
 	std::cout << "  4: Find an element(with its ISBN number and list its position) of a sorted list using binary search" << std::endl;
 	std::cout << "  5: Delete an element that is at a certain position" << std::endl;
 	std::cout << "  6: Delete an element by using its ISBN number" << std::endl;
-	std::cout << "  7: Sort the list by the ISBN numbers (using selection sort)" << std::endl;
+	std::cout << "  7: Sort the list by the ISBNs numbers (using selection sort)" << std::endl;
 	std::cout << "  8: Sort the list by the ISBN numbers (using bubble sort)" << std::endl;
 	std::cout << "  9: Print out the list" << std::endl;
 	std::cout << "  10: Quit Program" << std::endl;
@@ -61,9 +38,7 @@ int getUserChoice()
 
 	return choice;
 }
-
-//function to get input of ISBN number or position of the book
-int getUserInput(bool ISBN)
+int Booklist::getUserInput(bool ISBN)
 {
 	int num = 0;
 
@@ -80,45 +55,45 @@ int getUserInput(bool ISBN)
 	return num;
 }
 
-void insert(int mylist[], int * num_in_list, int new_element)
+void Booklist::insert(int new_element)
 {
 	//increment the list count by 1 everytime a new element is inserted
-	(*num_in_list) += 1;
+	num_in_list += 1;
 	//shift the list backwards
-	*(mylist + (*num_in_list) - 1) = new_element;
+	*(mylist + (num_in_list) - 1) = new_element;
+	sorted = false;
 }
 
-
-//insert book at any point in the list
-void insert_at(int mylist[], int * num_in_list, int at_position, int new_element)
+void Booklist::insert_at(int at_position, int new_element)
 {
 	//check to make sure book capacity has not been reached
-
-	if((*num_in_list) > 20)
+	if(num_in_list > 20)
 	{
 		throw std::invalid_argument("The list of books is full.");
 	}
 	else
 	{
 		//check to make sure there are enough books to add at this position
-		if((at_position >= 1) && (at_position <= (*num_in_list + 1)))
+		if((at_position >= 1) && (at_position <= (num_in_list + 1)))
 		{
 			//sliding the books that are before the position back 
-			for(int i = (*num_in_list); i >= at_position; i--)
+			for(int i = (num_in_list); i >= at_position; i--)
 			{
 				*(mylist + i) = *(mylist + i - 1);	
 			}
-			(*num_in_list) += 1;		//keeping track of how many books are in the total booklist 
+			num_in_list += 1;		//keeping track of how many books are in the total booklist 
 			*(mylist + at_position - 1) = new_element;	//adding the new element to the booklist
 		}
 		else
 		{
 			throw std::invalid_argument("There are not enough books to add a book at that position");
 		}
+		sorted = false;
 	}
+
 }
 
-int find_linear(int mylist[], int num_in_list, int element, bool print)
+int  Booklist::find_linear(int element)
 {
 	int position = -1;
 
@@ -128,7 +103,7 @@ int find_linear(int mylist[], int num_in_list, int element, bool print)
 		{
 			//once element is found, store the position (+1 because array starts at 0)
 			position = i + 1;
-				std::cout << "The book is in position " << position << std::endl;
+			std::cout << "The book is in position " << position << std::endl;
 			break;
 		}
 
@@ -140,7 +115,7 @@ int find_linear(int mylist[], int num_in_list, int element, bool print)
 	return position;
 }
 
-int find_binary(int mylist[], int num_in_list, int element, bool sorted)
+int  Booklist::find_binary(int element)
 {
 	int position = -1;
 
@@ -186,43 +161,43 @@ int find_binary(int mylist[], int num_in_list, int element, bool sorted)
 	return position;
 }
 
-void delete_item_position(int mylist[], int * num_in_list, int position)
+void Booklist::delete_item_position(int position)
 {
-	if(*num_in_list == 0)
+	if(num_in_list == 0)
 	{
 		std::cout << "Error - book list is empty" << std::endl;
 	}
 
 	//check if a valid position (that a book exists that position)
-	if((position < 1) || (position > (*num_in_list)))
+	if((position < 1) || (position > num_in_list))
 	{
 		std::cout << "Book does not exist in specified position" << std::endl;
 	}
 	else
 	{
 		//go to position, and shift over the rest of the elements after removing at given position
-		for(int i = position; i < (*num_in_list); i++)
+		for(int i = position; i < num_in_list; i++)
 		{
 			*(mylist + i - 1) = *(mylist + i);
 		}
 		//adjust list by decrementing after deleting the element
-		(*num_in_list) -= 1;
+		num_in_list -= 1;
 	}
 }
 
-void delete_item_isbn(int mylist[], int * num_in_list, int element)
+void Booklist::delete_item_isbn(int element)
 {
-	if(*num_in_list == 0)
+	if(num_in_list == 0)
 	{
 		std::cout << "Error - book list is empty" << std::endl;
 	}
 	
 	//find position using existing function and delete at position using existing function
-	int position = find_linear(mylist, *(num_in_list), element, false);
-	delete_item_position(mylist, num_in_list, position);
-} 
+	int position = find_linear(element);
+	delete_item_position(position);
+}
 
-void sort_list_selection(int mylist[], int num_in_list)
+void Booklist::sort_list_selection()
 {
 	int minpos = 0;
 	int temp = 0;
@@ -242,10 +217,10 @@ void sort_list_selection(int mylist[], int num_in_list)
 		*(mylist + minpos) = *(mylist + i);
 		*(mylist + i) = temp;
 	}
-
+	sorted = true;
 }
 
-void sort_list_bubble(int mylist[], int num_in_list)
+void Booklist::sort_list_bubble()
 {
 	int temp = 0;
 	for(int i = 0; i < num_in_list - 1; i++)
@@ -260,81 +235,19 @@ void sort_list_bubble(int mylist[], int num_in_list)
 			}
 		}
 	}
-} 
+	sorted = true;
+}
 
-int main()
+void Booklist::print()
 {
-	int ISBN     	= 0;
-	int position 	= 0; 
-	int num_in_list = 0;
-
-	int mylist[20]  = {};
-	bool exitStatus = true;
-	bool sorted     = false;
-
-
-	while(exitStatus)
+	std::cout << "Your book list is now: " << std::endl;
+	if(num_in_list != 0)
 	{
-		int choice = getUserChoice();
-
-		if((choice == 1) || (choice == 2) || (choice == 3) || (choice == 4) || (choice == 6))
+		for(int i = 0; i < num_in_list; i++)
 		{
-			ISBN = getUserInput(true);
-		}
-
-		if((choice == 2) || (choice == 5))
-		{
-			position = getUserInput(false);
-		}
-
-		//switch cases going through menu choices
-		switch(choice)
-		{
-			case 1:
-				insert(mylist, &num_in_list, ISBN);
-				print(mylist, num_in_list);
-				break;
-
-			case 2: 
-				insert_at(mylist, &num_in_list, position, ISBN);
-				print(mylist, num_in_list);
-				break;
-			
-			case 3: 
-				find_linear(mylist, num_in_list, ISBN, true);
-				break;
-
-			case 4: 
-				find_binary(mylist, num_in_list, ISBN, sorted);
-				break;
-
-			case 5: 
-				delete_item_position(mylist, &num_in_list, position);
-				break;
-
-			case 6: 
-				delete_item_isbn(mylist, &num_in_list, ISBN);
-				break;
-
-			case 7: 
-				sort_list_selection(mylist, num_in_list);
-				break;
-
-			case 8:
-				sort_list_bubble(mylist, num_in_list);
-				break;
-
-			case 9:
-				print(mylist, num_in_list);
-				break;
-			case 10:
-				exitStatus = false;
-				break;
-
-			default:
-				std::cout << "Please enter a valid menu choice! " << std::endl;
+			std::cout << (i+1) << ". " << mylist[i] << std::endl;
 		}
 	}
-
-	return 0;
+	else {std::cout << "Empty." << std::endl;}
+	std::cout << std::endl;
 }
