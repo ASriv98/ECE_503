@@ -5,13 +5,16 @@
 #include <fstream>
 #include <iomanip>
 #include <time.h>
-#include "matplotlibcpp.h"
 #include <cmath>
 
 //MATLAB inits
 #if(_MSC_VER>=1600)
 #define _STDC_utf_16__
 #endif
+
+#include "mex.h"
+#include <engine.h>
+#include <vector>
 
 #pragma comment(lib,"libmx.lib")
 #pragma comment(lib,"libmex.lib")
@@ -343,5 +346,66 @@ void StockAccount::trackPortfolio()
 
 void StockAccount::graphPortfolio()
 {
-
+	Engine * ep;
+	ep = engOpen(NULL);
+	
+	if(ep == NULL)
+	{
+		cout << "ERROR: engine open failed" << endl;
+		exit(1)
+	}
+	
+	vector<double> time;
+	vector<double> value;
+	
+	ifstream graph("totalPortfolio.txt");
+	double val;
+	int timeVal;
+	int count;
+	
+	while (!graph)
+	{
+		if (counter % 2 == 0)
+		{
+			graph >> val;
+			value.push_back(val)
+		}
+		
+		else
+		{
+			graph >> timeVal;
+			time.push_back(timeVal);
+		}
+		counter++;
+	}
+	
+	double timeIndex[time.size()];
+	double valueIndex[value.size()];
+	
+	for(int i=0; i < time.size(); i++)
+	{
+		timeIndex[i] = time[i];
+	}
+	
+	for(int i=0; i < value.size(); i++)
+	{
+		valueIndex[i] = value[i];
+	}
+	
+	mxArray * A;
+	mxArray * B;
+	
+	A = mxCreateDoubleMatrix(1, time.size(), mxREAL);
+	B = mxCreateDoubleMatrix(1, value.size(), mxREAL);
+	
+	engPutVariable(ep, "time", A);
+	engPutVariable(ep, "value", B);
+	
+	engEvalString(ep, "plot(time, value)");
+	system("pause");
+	
+	mxDestroyArray(A);
+	engEvalString(ep, "close";);
+	engClose(ep);
+	
 }
