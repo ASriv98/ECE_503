@@ -3,13 +3,10 @@
 
 int main()
 {
-
-	std::cout << "made it" << std::endl;
-	Booklist<std::string> booklist;
+	Booklist booklist;
 	bool exitStatus = true;
-	std::string ISBN = "";
+	int ISBN;
 	int position;
-
 
 	booklist.print();
 
@@ -19,12 +16,12 @@ int main()
 
 		if((choice == 1) || (choice == 2) || (choice == 3) || (choice == 4) || (choice == 6))
 		{
-			ISBN = booklist.getUserISBN();
+			ISBN = booklist.getUserInput(true);
 		}
 
 		if((choice == 2) || (choice == 5))
 		{
-			position = booklist.getPosition();
+			position = booklist.getUserInput(false);
 		}
 
 		//switch cases going through menu choices
@@ -55,6 +52,7 @@ int main()
 			case 6: 
 				booklist.delete_item_isbn(ISBN);
 				break;
+
 			case 7: 
 				booklist.sort_list_selection();
 				break;
